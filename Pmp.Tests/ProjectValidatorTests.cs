@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Pmp.Api.Validators; //validator class
+using Pmp.Api.Validators;
 namespace Pmp.Tests;
 public class ProjectValidatorTests
 {
@@ -10,6 +10,4 @@ public class ProjectValidatorTests
         bool result=validator.IsValidName("");
         Assert.False(result);
     }
-
-    
 }

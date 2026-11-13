@@ -31,7 +31,6 @@ public sealed class CreateProjectRequest
     public ProjectType Type {get;set;}
     public Sector Sector {get;set;}
     public Methodology Methodology {get;set;}
-    // Project ka current status
     public ProjectStatus Status { get; set; }
 
 }

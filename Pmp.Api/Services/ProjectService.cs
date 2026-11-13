@@ -26,7 +26,6 @@ public class ProjectService(IProjectRepository repository) : IProjectService
                 "Project code is required.");
         }
 
-        // 2. Check project name
         if (string.IsNullOrWhiteSpace(request.Name))
         {
             throw new ArgumentException(
@@ -35,7 +34,6 @@ public class ProjectService(IProjectRepository repository) : IProjectService
 
         string code = request.Code.Trim();
 
-        // 3. Check duplicate project code
         bool available = await IsCodeAvailableAsync(code);
 
         if (!available)
@@ -44,7 +42,6 @@ public class ProjectService(IProjectRepository repository) : IProjectService
                 "Project code already exists.");
         }
 
-        // 4. Check customer
         bool customerExists = await _repository
             .CustomerExistsAsync(request.CustomerId);
 
@@ -54,7 +51,6 @@ public class ProjectService(IProjectRepository repository) : IProjectService
                 "Customer does not exist.");
         }
 
-        // 5. Check onshore manager
         bool onshoreExists = await _repository
             .EmployeeExistsAsync(request.OnshoreManagerId);
 
@@ -64,7 +60,6 @@ public class ProjectService(IProjectRepository repository) : IProjectService
                 "Onshore manager does not exist.");
         }
 
-        // 6. Check offshore manager
         bool offshoreExists = await _repository
             .EmployeeExistsAsync(request.OffshoreManagerId);
 
@@ -74,21 +69,18 @@ public class ProjectService(IProjectRepository repository) : IProjectService
                 "Offshore manager does not exist.");
         }
 
-        // 7. Validate project dates
         if (request.EndDate < request.StartDate)
         {
             throw new ArgumentException(
                 "End date cannot be before start date.");
         }
 
-        // 8. Validate estimated hours
         if (request.EstimatedHours < 0)
         {
             throw new ArgumentException(
                 "Estimated hours cannot be negative.");
         }
 
-        // 9. Create project object
         var project = new Project
         {
             Code = code,
@@ -115,14 +107,11 @@ public class ProjectService(IProjectRepository repository) : IProjectService
             CreatedAt = DateTimeOffset.UtcNow
         };
 
-        // 10. Save project
         await _repository.AddAsync(project);
 
-        // Return saved project
         return project;
     }
 
-    // Get all projects
     public async Task<List<Project>> GetAllProjectsAsync()
     {
         return await _repository.GetAllAsync();
