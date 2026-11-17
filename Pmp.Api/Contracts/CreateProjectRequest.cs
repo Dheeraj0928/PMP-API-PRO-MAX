@@ -22,7 +22,7 @@ public sealed class CreateProjectRequest
     public DateTimeOffset EndDate{get;set;}
     public DateTimeOffset? RevisedEndDate {get;set;}
     public DateTimeOffset? RenewalDate {get;set;}
-    public DateTimeOffset Issuedate {get;set;}
+    public DateTimeOffset IssueDate {get;set;}
 
     [Range(0,double.MaxValue)]
     public decimal EstimatedHours{get;set;}
