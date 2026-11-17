@@ -6,15 +6,14 @@ using Pmp.Api.Repositories;
 using Pmp.Api.Contracts;
 using Pmp.Api.Models;
 using Pmp.Api.Services;
-using Azure.Core.Pipeline;
 
 namespace Pmp.Tests;
 
-public class ProjectServicesTest
+public class ProjectServiceTests
 {
     // TEST 1: Duplicate project code reject hona chahiye
     [Fact]
-    public async Task DuplicateProjectCode_ShouldRejected()
+    public async Task DuplicateProjectCode_ShouldBeRejected()
     {
         var mockRepo = new Mock<IProjectRepository>();
 
@@ -41,7 +40,7 @@ public class ProjectServicesTest
 
     // TEST 2: Invalid customer reject hona chahiye
     [Fact]
-    public async Task Invalidcustomer_ShouldRejectProject()
+    public async Task InvalidCustomer_ShouldRejectProject()
     {
         var mockRepo = new Mock<IProjectRepository>();
 
@@ -201,7 +200,7 @@ public class ProjectServicesTest
         var service = new ProjectService(mockRepo.Object);
         var request = new CreateProjectRequest
         {
-            Code = "",
+            Code = "   ",
             Name = "Website Project"
         };
 
@@ -231,7 +230,8 @@ public class ProjectServicesTest
         // When
         Func<Task> act = () => service.CreateProjectAsync(request);
         // Then
-        await act.Should().ThrowAsync<ArgumentException>().WithoutMessage("Project name is required");
+        await act.Should().ThrowAsync<ArgumentException>()
+            .WithMessage("Project name is required.");
 
         mockRepo.Verify(
             repo => repo.AddAsync(It.IsAny<Project>()),Times.Never
@@ -246,8 +246,7 @@ public class ProjectServicesTest
         var request = new CreateProjectRequest
         {
             Code = "PRJ008",
-            Name = ""
-
+            Name = "   "
         };
         // When
 
@@ -275,7 +274,10 @@ public class ProjectServicesTest
         var request = new CreateProjectRequest
         {
             Code = "PRJ009",
-            Name = "Website Project"
+            Name = "Website Project",
+            CustomerId = 1,
+            OnshoreManagerId = -1,
+            OffshoreManagerId = 2
         };
 
         // When
@@ -283,7 +285,8 @@ public class ProjectServicesTest
         Func<Task> act = () => service.CreateProjectAsync(request);
 
         // Then
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage("Customer does not exist.");
+        await act.Should().ThrowAsync<ArgumentException>()
+            .WithMessage("Onshore manager does not exist.");
         mockRepo.Verify(
             repo => repo.AddAsync(It.IsAny<Project>()), Times.Never
         );
@@ -357,7 +360,7 @@ public class ProjectServicesTest
     }
 
     [Fact]
-    public async Task ProjectName_ShouldBeTrimed()
+    public async Task ProjectName_ShouldBeTrimmed()
     {
         //Arrange
         var mockRepo= new Mock<IProjectRepository>();
@@ -532,7 +535,7 @@ public async Task DuplicateCodeWithSpaces_ShouldRejectProject()
         mockRepo.Setup(repo=>repo.CodeExistsAsync("PRJ001")).ReturnsAsync(true);
         var service = new ProjectService(mockRepo.Object);
         var request = new CreateProjectRequest{
-            Code="PRJ001",
+            Code="  PRJ001  ",
             Name="Duplicate Website Project"
         };
 
@@ -564,6 +567,10 @@ public async Task DuplicateCodeWithSpaces_ShouldRejectProject()
 
         //Assert
         await act.Should().ThrowAsync<ArgumentException>().WithMessage("Customer does not exist.");
+
+        mockRepo.Verify(
+            repo => repo.EmployeeExistsAsync(It.IsAny<int>()),
+            Times.Never);
 
         mockRepo.Verify(
             repo=>repo.AddAsync(It.IsAny<Project>()),Times.Never
