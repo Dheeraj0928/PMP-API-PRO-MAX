@@ -11,7 +11,6 @@ namespace Pmp.Tests;
 
 public class ProjectServiceTests
 {
-    // TEST 1: Duplicate project code reject hona chahiye
     [Fact]
     public async Task DuplicateProjectCode_ShouldBeRejected()
     {
@@ -38,7 +37,6 @@ public class ProjectServiceTests
             Times.Never);
     }
 
-    // TEST 2: Invalid customer reject hona chahiye
     [Fact]
     public async Task InvalidCustomer_ShouldRejectProject()
     {
@@ -69,7 +67,6 @@ public class ProjectServiceTests
             Times.Never);
     }
 
-    // TEST 3: Saare projects return hone chahiye
     [Fact]
     public async Task GetAllProjects_ShouldReturnProjects()
     {
@@ -160,7 +157,6 @@ public class ProjectServiceTests
         project.CustomerId.Should().Be(1);
         project.EstimatedHours.Should().Be(100);
 
-        // Step 10: Confirm karo repository ne save method call kiya
         mockRepo.Verify(
             repo => repo.AddAsync(It.Is<Project>(p =>
                 p.Code == "PRJ003" &&
